@@ -25,6 +25,7 @@ OGRENME_ORANI = 1e-3
 # oluşturacağımız modele bir isim verelim.
 MODEL_ADI = 'kedi-kopek-ayirici'
 
+
 ### DOSYA ADLARINDAN ETİKET BİLGİLERİNİN ALINMASI ###
 
 # etiket_olustur isminde bir fonksiyon tanımlayalım.
@@ -32,11 +33,12 @@ MODEL_ADI = 'kedi-kopek-ayirici'
 # fonksiyon dosya adı "cat" ise [1 0], "dog" ise [0 1] çıkışını verir.
 
 def etiket_olustur(resim_adi):
-    obje_turu = resim_adi.split('.')[-3] #noktadan önceki 3 karakteri algıla
+    obje_turu = resim_adi.split('.')[-3]  # noktadan önceki 3 karakteri algıla
     if obje_turu == 'cat':
-        return np.array([1,0])
+        return np.array([1, 0])
     elif obje_turu == 'dog':
-        return np.array([0,1])
+        return np.array([0, 1])
+
 
 ### RESİMLERİN MATRİS HALİNE DÖNÜŞTÜRÜLMESİ ###
 
@@ -58,6 +60,7 @@ def egitim_verisi_olustur():
     np.save('egitim_verisi.npy', olusturulan_egitim_verisi)
     return olusturulan_egitim_verisi
 
+
 # test klasöründeki resimlerden eğitimde kullanılabilecek şekilde test verisi oluştur.
 # oluşturulan test verisi "test_verisi.npy" isimli dosyaya yazılır
 # fonksiyon içerisinde verilerin karıştırılması (shuffle) sağlanır.
@@ -74,6 +77,7 @@ def test_verisi_olustur():
     shuffle(olusturulan_test_verisi)
     np.save('test_verisi.npy', olusturulan_test_verisi)
     return olusturulan_test_verisi
+
 
 # "egitim_verisi.npy" ve "test_verisi.npy" dosyaları daha önce oluşturulmadıysa:
 # egitim_verisi = egitim_verisi_olustur()
@@ -99,7 +103,7 @@ tf.reset_default_graph()
 # ağımızın girişinin boyutlarının ne olacağını tanımlayalım
 convnet = input_data(shape=[None, RESIM_BOYUTU, RESIM_BOYUTU, 1], name='input')
 
-# 32 adet 5x5 boyutunda filtrelerden oluşan ve relu aktivasyonlu konvolüsyon katmanı 
+# 32 adet 5x5 boyutunda filtrelerden oluşan ve relu aktivasyonlu konvolüsyon katmanı
 convnet = conv_2d(convnet, 32, 5, activation='relu')
 
 # 5x5 boyutunda filtelerden oluşan max_pool katmanı
@@ -120,43 +124,44 @@ convnet = max_pool_2d(convnet, 5)
 # 1024 birimden oluşan tam bağlantılı ve relu aktivasyonlu katman
 convnet = fully_connected(convnet, 1024, activation='relu')
 
-# aşırı öğrenmeyi yani ezberlemeyi (overfitting) engellemek için dropout katmanı  
+# aşırı öğrenmeyi yani ezberlemeyi (overfitting) engellemek için dropout katmanı
 convnet = dropout(convnet, 0.8)
 
 # 2 birimli ve softmax aktivasyonlu tam bağlantılı katman
 convnet = fully_connected(convnet, 2, activation='softmax')
 
-# oluşturulan mimariyi, öğrenme oranını, optimizasyon türünü, kayıp fonksiyonunu ve dosya isimlerinden aldığımız hedef değerlerini 
+# oluşturulan mimariyi, öğrenme oranını, optimizasyon türünü, kayıp fonksiyonunu ve dosya isimlerinden aldığımız hedef değerlerini
 # kullanarak ağı oluşturalım.
-convnet = regression(convnet, optimizer='adam', learning_rate=OGRENME_ORANI, loss='categorical_crossentropy', name='targets')
+convnet = regression(convnet, optimizer='adam', learning_rate=OGRENME_ORANI, loss='categorical_crossentropy',
+                     name='targets')
 
 # OLUŞTURULAN MİMARİ İLE DEEP LEARNING NETWORK (DNN) MODELİ OLUŞTURULMASI
 model = tflearn.DNN(convnet, tensorboard_dir='log', tensorboard_verbose=0)
 
 # VERİLERLE EĞİTİM YAPILMASI
-model.fit({'input': X_egitim}, {'targets': y_egitim}, n_epoch=1,
+model.fit({'input': X_egitim}, {'targets': y_egitim}, n_epoch=10,
           validation_set=({'input': X_test}, {'targets': y_test}),
           snapshot_step=500, show_metric=True, run_id=MODEL_ADI)
 
 ### OLUŞTURULAN DERİN AĞ MODELİNİN TEST EDİLMESİ
 
-fig=plt.figure(figsize=(16, 12))
+fig = plt.figure(figsize=(16, 12))
 
-for num, data in enumerate(test_verisi[:16]):
-    
-    resim_no = data[1]
-    resim_verisi = data[0]
-    
-    y = fig.add_subplot(4, 4, num+1)
+for no, veri in enumerate(test_verisi[:16]):
+
+    resim_no = veri[1]
+    resim_verisi = veri[0]
+
+    y = fig.add_subplot(4, 4, no + 1)
     orig = resim_verisi
     veri = resim_verisi.reshape(RESIM_BOYUTU, RESIM_BOYUTU, 1)
-    model_out = model.predict([veri])[0]
-    
-    if np.argmax(model_out) == 1: 
-        str_label='Dog'
+    ag_cikisi = model.predict([veri])[0]
+
+    if np.argmax(ag_cikisi) == 1:
+        str_label = 'Köpek'
     else:
-        str_label='Cat'
-        
+        str_label = 'Kedi'
+
     y.imshow(orig, cmap='gray')
     plt.title(str_label)
     y.axes.get_xaxis().set_visible(False)

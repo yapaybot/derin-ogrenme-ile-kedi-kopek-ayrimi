@@ -25,7 +25,6 @@ OGRENME_ORANI = 1e-3
 # oluşturacağımız modele bir isim verelim.
 MODEL_ADI = 'kedi-kopek-ayirici'
 
-
 ### DOSYA ADLARINDAN ETİKET BİLGİLERİNİN ALINMASI ###
 
 # etiket_olustur isminde bir fonksiyon tanımlayalım.
@@ -39,15 +38,12 @@ def etiket_olustur(resim_adi):
     elif obje_turu == 'dog':
         return np.array([0, 1])
 
-
 ### RESİMLERİN MATRİS HALİNE DÖNÜŞTÜRÜLMESİ ###
-
 
 # train klasöründeki resimlerden eğitimde kullanılabilecek şekilde eğitim verisi oluştur.
 # oluşturulan eğitim verisi "egitim_verisi.npy" isimli dosyaya yazılır.
 # fonksiyon içerisinde verilerin karıştırılması (shuffle) sağlanır.
 # resimler gri olarak okunup 50x50 piksel olacak şekilde yeniden boyutlandırılır.
-
 
 def egitim_verisi_olustur():
     olusturulan_egitim_verisi = []
@@ -59,7 +55,6 @@ def egitim_verisi_olustur():
     shuffle(olusturulan_egitim_verisi)
     np.save('egitim_verisi.npy', olusturulan_egitim_verisi)
     return olusturulan_egitim_verisi
-
 
 # test klasöründeki resimlerden eğitimde kullanılabilecek şekilde test verisi oluştur.
 # oluşturulan test verisi "test_verisi.npy" isimli dosyaya yazılır
@@ -77,7 +72,6 @@ def test_verisi_olustur():
     shuffle(olusturulan_test_verisi)
     np.save('test_verisi.npy', olusturulan_test_verisi)
     return olusturulan_test_verisi
-
 
 # "egitim_verisi.npy" ve "test_verisi.npy" dosyaları daha önce oluşturulmadıysa:
 # egitim_verisi = egitim_verisi_olustur()
@@ -143,7 +137,7 @@ model.fit({'input': X_egitim}, {'targets': y_egitim}, n_epoch=10,
           validation_set=({'input': X_test}, {'targets': y_test}),
           snapshot_step=500, show_metric=True, run_id=MODEL_ADI)
 
-### OLUŞTURULAN DERİN AĞ MODELİNİN TEST EDİLMESİ
+### OLUŞTURULAN DERİN AĞ MODELİNİN TEST VERİLERİ ÜZERİNDE DENENMESİ
 
 fig = plt.figure(figsize=(16, 12))
 

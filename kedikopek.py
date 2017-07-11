@@ -32,7 +32,7 @@ MODEL_ADI = 'kedi-kopek-ayirici'
 # fonksiyon dosya adı "cat" ise [1 0], "dog" ise [0 1] çıkışını verir.
 
 def etiket_olustur(resim_adi):
-    obje_turu = resim_adi.split('.')[-3]  # noktadan önceki 3 karakteri algıla
+    obje_turu = resim_adi.split('.')[-3]  # dosya adında bulunan "cat" ya da "dog" kelimesini al 
     if obje_turu == 'cat':
         return np.array([1, 0])
     elif obje_turu == 'dog':
